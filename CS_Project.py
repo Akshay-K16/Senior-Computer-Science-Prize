@@ -1,3 +1,4 @@
+# Import libraries needed to run the GUI and retrieve the data.
 import tkinter
 from PIL import Image
 from PIL import ImageTk
@@ -5,34 +6,43 @@ import requests
 import json
 
 
+# Main Function
 def main():
+    # Functions to get API data
     data = get_api()
-    GUI(data)
+    global_data = get_global()
+
+    # Runs the Graphical User Interface
+    GUI(data, global_data)
     
 
-# Retrieving API data with coronavirus stats
+# Retrieving API data with countries' coronavirus stats
 def get_api():
     try:
         response = requests.get("https://disease.sh/v2/countries?yesterday=false")
-        print(response.status_code)
+        print(response.status_code) # Should be 200
         res = response.json()
         return res
     except:
         print("Unexpected error")
-        exit(0)
+        exit(0) # End Progarm
 
+
+# Retrieving API global coronavirus data.
 def get_global():
     try:
         response = requests.get("https://disease.sh/v2/all")
-        print(response.status_code)
+        print(response.status_code) # Should be 200
         res = response.json()
         message = "Global Stats:\n\nTotal Confirmed Cases: " + str(res["cases"]) + "\nTotal Deaths: " + str(res["deaths"]) + "\nTotal Countries Affected: " + str(res["affectedCountries"])
         return message
     except:
         print("Unexpected error")
-        exit(0)
+        exit(0) # End Program
+        
 
-def GUI(res):
+# Runs the User Interface
+def GUI(res, message_text):
     window = tkinter.Tk()
 
     # Title and Window Size
@@ -46,18 +56,23 @@ def GUI(res):
     img= tkinter.Label(window, image=image)
     img.pack(expand ="YES", fill = "both")
     window.iconphoto(False, image)
-
-    message_text = get_global()
     
     # Creating Widgets
     global_stats = tkinter.Message(img, text=message_text, bg="#000000", fg="#ffffff", justify="center", relief="raised")
     label = tkinter.Label(img, text = "Country:", padx=5, pady=5, bg="#000000", fg="#ffffff", relief="raised")
     entry = tkinter.Entry(img, bd =5, bg="#000000", fg="#ffffff", relief="raised", insertbackground='#ffffff')
-    def home():
-        window.destroy()
-        GUI(res)
+    end_label = tkinter.Label(img, text = "Data provided for free by https://corona.lmao.ninja", bg="#000000", fg="#ffffff", relief='raised')
 
+    # Functions that are run on button clicks.
+    def home():
+        # Returns Home
+        window.destroy()
+        GUI(res, message_text)
+    def close():
+        # Close Windows
+        window.destroy()
     def clicked():
+        # Displays Country Information when button is clicked.
         country = entry.get()
         entry.delete(0, tkinter.END)
         m1 = "Country not found"
@@ -69,24 +84,28 @@ def GUI(res):
                 m1 = m2 + m3 + m4
                 break
         m = tkinter.Message(img, text=m1, bg="#000000", fg="#ffffff", justify="center", relief="raised")
+
+        #Remove Homepage Widgets
         global_stats.destroy()
         label.destroy()
         entry.destroy()
         button.destroy()
-        
-        return_home = tkinter.Button(img, text="Return Home", command=home, bg="#000000", fg="#ffffff", relief="raised").place(x=640, y=25)
+
+        # Creating and Displaying widgets.
+        return_home = tkinter.Button(img, text="Return Home", command=home, bg="#000000", fg="#ffffff", relief="raised").place(x=683, y=30, anchor="center")
+        close_button = tkinter.Button(img, text="Close", command=close, bg="#000000", fg="#ffffff", relief="raised").place(x=40, y=30, anchor="center")
         m.place(x=375, y = 250, anchor='center')
-        foot = tkinter.Label(img, text = "Data provided for free by https://corona.lmao.ninja", bg="#000000", fg="#ffffff", relief="raised").place(x=375, y=450, anchor="center")
+        foot = tkinter.Label(img, text = "Data provided for free by https://corona.lmao.ninja", bg="#000000", fg="#ffffff", relief="raised").place(x=375, y=465, anchor="center")
+
         
     button = tkinter.Button(img, text="Enter", command=clicked, activebackground='#454545', bg="#000000", fg="#ffffff", relief="raised")
 
     # Displaying Widgets.
-    global_stats.place(x=375, y = 120, anchor='center')
-    label.place(x=375, y = 205, anchor='center')
-    entry.place(x=375, y = 235, anchor='center')
-    button.place(x=375, y = 265, anchor='center')
-    end_label = tkinter.Label(img, text = "Data provided for free by https://corona.lmao.ninja", bg="#000000", fg="#ffffff", relief='raised')
-    end_label.place(x=375, y=450, anchor='center')
+    global_stats.place(x=375, y = 120, anchor='center') # Global Stats Message  (Homepage)
+    label.place(x=375, y = 205, anchor='center')        # "Country" label       (Homepage)
+    entry.place(x=375, y = 235, anchor='center')        # Entry Box             (Homepage)
+    button.place(x=375, y = 265, anchor='center')       # Enter Button          (Homepage)
+    end_label.place(x=375, y=465, anchor='center')      # Footer Label          (Homepage)
 
     window.mainloop()
 
