@@ -25,7 +25,7 @@ def get_api():
         return res
     except:
         print("Unexpected error")
-        exit(0) # End Progarm
+        exit(1) # End Progarm
 
 
 # Retrieving API global coronavirus data.
@@ -38,12 +38,13 @@ def get_global():
         return message
     except:
         print("Unexpected error")
-        exit(0) # End Program
+        exit(1) # End Program
         
 
 # Runs the User Interface
 def GUI(res, message_text):
     window = tkinter.Tk()
+    # Start of code for tkinter window.
 
     # Title and Window Size
     window.title("Covid-19 Tracker")
@@ -73,16 +74,27 @@ def GUI(res, message_text):
         window.destroy()
     def clicked():
         # Displays Country Information when button is clicked.
-        country = entry.get()
-        entry.delete(0, tkinter.END)
+
         m1 = "Country not found"
-        for item in res:
-            if item["country"] == country:
-                m2 = "Total " + item["country"] + " cases:\n" + str(item["cases"]) + "\n"
-                m3 = "Total " + item["country"] + " deaths:\n" + str(item["deaths"]) + "\n"
-                m4 = "Total " + item["country"] + " recovered:\n" + str(item["recovered"])
-                m1 = m2 + m3 + m4
-                break
+        try:
+            # Turn user input into correct format
+            Country = entry.get()
+            country = Country.lower()
+            c = chr(ord(country[0])-32) + country[1:]
+            entry.delete(0, tkinter.END)
+
+            # Search data for country
+            for item in res:
+                if item["country"] in [Country, c, country.upper()]:
+                    m2 = "Total " + item["country"] + " cases:\n" + str(item["cases"]) + "\n"
+                    m3 = "Total " + item["country"] + " deaths:\n" + str(item["deaths"]) + "\n"
+                    m4 = "Total " + item["country"] + " recovered:\n" + str(item["recovered"])
+                    m1 = m2 + m3 + m4
+                    break
+        except:
+            # No country entered.
+            m1 = "Please Enter a Country"
+            
         m = tkinter.Message(img, text=m1, bg="#000000", fg="#ffffff", justify="center", relief="raised")
 
         #Remove Homepage Widgets
@@ -101,12 +113,13 @@ def GUI(res, message_text):
     button = tkinter.Button(img, text="Enter", command=clicked, activebackground='#454545', bg="#000000", fg="#ffffff", relief="raised")
 
     # Displaying Widgets.
-    global_stats.place(x=375, y = 120, anchor='center') # Global Stats Message  (Homepage)
-    label.place(x=375, y = 205, anchor='center')        # "Country" label       (Homepage)
-    entry.place(x=375, y = 235, anchor='center')        # Entry Box             (Homepage)
-    button.place(x=375, y = 265, anchor='center')       # Enter Button          (Homepage)
+    global_stats.place(x=375, y = 145, anchor='center') # Global Stats Message  (Homepage)
+    label.place(x=375, y = 220, anchor='center')        # "Country" label       (Homepage)
+    entry.place(x=375, y = 250, anchor='center')        # Entry Box             (Homepage)
+    button.place(x=375, y = 280, anchor='center')       # Enter Button          (Homepage)
     end_label.place(x=375, y=465, anchor='center')      # Footer Label          (Homepage)
 
+    # End of code for tkinter window.
     window.mainloop()
 
 
